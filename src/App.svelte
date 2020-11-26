@@ -60,6 +60,7 @@
         context.save();
         context.translate($coords.x - $scale * 100, $coords.y - $scale * 100);
         context.translate(canvas.width / 2, canvas.height / 2);
+        context.scale($scale, $scale);
         context.rotate((($rotation + 360) * Math.PI) / 180);
 
         context.drawImage(
@@ -263,6 +264,7 @@ how to remove the virtical space around the range input in IE*/
       </label>
       <input id="upload" type="file" name="file" on:change={handleUpload} />
       <div class="hats"><img src="assets/gorro_01.png" bind:this={hat} /></div>
+      <button>Salvar ⬇</button>
     </form>
   </main>
 </div>
