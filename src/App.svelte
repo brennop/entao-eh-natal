@@ -1,15 +1,17 @@
 <script>
   import { onMount } from "svelte";
+  import { spring } from "svelte/motion";
+
   let canvas;
   let hat;
   let image;
-  let x = 0,
-    y = 0;
   let mouseX = 0,
     mouseY = 0;
   let moving = false;
 
-  let scale = 1;
+  let coords = spring({ x: 0, y: 0 });
+  let scale = spring(1);
+  let rotation = spring(0);
 
   const handleUpload = async (event) => {
     const [file] = event.target.files;
@@ -22,34 +24,13 @@
     });
   };
 
-  function draw() {
-    if (canvas) {
-      const context = canvas.getContext("2d");
-
-      context.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (image) {
-        context.drawImage(image, 0, 0, 500, 500);
-        context.drawImage(
-          hat,
-          x - 100 * scale,
-          y - 100 * scale,
-          200 * scale,
-          200 * scale
-        );
-      }
-      requestAnimationFrame(draw);
-    }
-  }
-
   function handleMove(event) {
     const { clientX, clientY } = event;
 
     if (moving) {
       const dx = clientX - mouseX;
       const dy = clientY - mouseY;
-      x += dx;
-      y += dy;
+      coords.update(({ x, y }) => ({ x: x + dx, y: y + dy }));
       mouseX = clientX;
       mouseY = clientY;
     }
@@ -67,8 +48,34 @@
     moving = false;
   }
 
+  $: {
+    if (canvas) {
+      const context = canvas.getContext("2d");
+
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (image) {
+        context.drawImage(image, 0, 0, 500, 500);
+
+        context.save();
+        context.translate($coords.x - $scale * 100, $coords.y - $scale * 100);
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate((($rotation + 360) * Math.PI) / 180);
+
+        context.drawImage(
+          hat,
+          -$scale * 100,
+          -$scale * 100,
+          200 * $scale,
+          200 * $scale
+        );
+
+        context.restore();
+      }
+    }
+  }
+
   onMount(() => {
-    draw();
     canvas.width = 500;
     canvas.height = 500;
   });
@@ -238,10 +245,20 @@ how to remove the virtical space around the range input in IE*/
         <p>Tamanho</p>
         <input
           type="range"
-          bind:value={scale}
+          bind:value={$scale}
           min="0.1"
           max="3"
           step="0.01"
+          class="slider" />
+      </label>
+      <label>
+        <p>Rotação</p>
+        <input
+          type="range"
+          bind:value={$rotation}
+          min="-90"
+          max="90"
+          step="0.1"
           class="slider" />
       </label>
       <input id="upload" type="file" name="file" on:change={handleUpload} />
