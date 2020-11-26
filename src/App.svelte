@@ -58,20 +58,12 @@
       if (image) {
         context.drawImage(image, 0, 0, 500, 500);
 
-        context.save();
-        context.translate($coords.x - $scale * 100, $coords.y - $scale * 100);
-        context.translate(canvas.width / 2, canvas.height / 2);
-        context.scale($scale, $scale);
+        context.setTransform($scale, 0, 0, $scale, $coords.x, $coords.y); // sets scale and origin
         context.rotate((($rotation + 360) * Math.PI) / 180);
 
-        context.drawImage(
-          hat,
-          -$scale * 100,
-          -$scale * 100,
-          200 * $scale,
-          200 * $scale
-        );
+        context.drawImage(hat, -100, -100, 200, 200);
 
+        context.setTransform(1, 0, 0, 1, 0, 0);
         context.restore();
       }
     }
