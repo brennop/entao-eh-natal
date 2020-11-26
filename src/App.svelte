@@ -10,8 +10,8 @@
     mouseY = 0;
   let moving = false;
 
-  let coords = spring({ x: 0, y: 0 });
-  let scale = spring(1);
+  let coords = spring({ x: 310, y: 50 });
+  let scale = spring(2);
   let rotation = spring(0);
 
   const handleUpload = async (event) => {
@@ -73,9 +73,16 @@
     canvas.toBlob((blob) => saveAs(blob, "entao-eh-natal.png"), "image/png");
   }
 
-  onMount(() => {
+  onMount(async () => {
     canvas.width = 500;
     canvas.height = 500;
+
+    image = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject();
+      image.src = "assets/zorron.webp";
+    });
   });
 </script>
 
@@ -83,8 +90,7 @@
   :global(body) {
     box-sizing: border-box;
     margin: 0;
-    font-family: "Lobster", Segoe UI, Helvetica, Arial, sans-serif,
-      Apple Color Emoji, Segoe UI Emoji, sans-serif;
+    font-family: "Lobster", Apple Color Emoji, Segoe UI Emoji, sans-serif;
   }
 
   canvas {
@@ -249,7 +255,7 @@ how to remove the virtical space around the range input in IE*/
       on:mousedown={handleMouseDown}
       on:mousemove={handleMove} />
     <form>
-      <h1>Então é Nataaaaaaaal</h1>
+      <h1>Então é Nataaaal 🎄</h1>
       <label for="upload" class="upload">Escolher imagem</label>
       <label>
         <p>Tamanho</p>
