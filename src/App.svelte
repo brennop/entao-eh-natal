@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
+  import saveAs from "file-saver";
 
   let canvas;
   let hat;
@@ -76,6 +77,10 @@
     }
   }
 
+  function save() {
+    canvas.toBlob((blob) => saveAs(blob, "entao-eh-natal.png"), "image/png");
+  }
+
   onMount(() => {
     canvas.width = 500;
     canvas.height = 500;
@@ -86,7 +91,8 @@
   :global(body) {
     box-sizing: border-box;
     margin: 0;
-    font-family: "Lobster", sans-serif;
+    font-family: "Lobster", Segoe UI, Helvetica, Arial, sans-serif,
+      Apple Color Emoji, Segoe UI Emoji, sans-serif;
   }
 
   canvas {
@@ -119,9 +125,10 @@
   }
 
   form {
-    padding: 16px;
+    padding: 0 16px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
   }
 
   .upload {
@@ -136,9 +143,6 @@
 
   input[type="file"] {
     display: none;
-  }
-
-  h1 {
   }
 
   input[type="range"].slider {
@@ -231,6 +235,19 @@ how to remove the virtical space around the range input in IE*/
       /*Edge starts the margin from the thumb, not the track as other browsers do*/
     }
   }
+
+  button {
+    background: #50613b;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: #f5ebe3;
+
+    font-family: "Lobster", Apple Color Emoji, Segoe UI Emoji, sans-serif;
+  }
 </style>
 
 <div class="background" on:mouseup={handleMouseUp}>
@@ -264,7 +281,7 @@ how to remove the virtical space around the range input in IE*/
       </label>
       <input id="upload" type="file" name="file" on:change={handleUpload} />
       <div class="hats"><img src="assets/gorro_01.png" bind:this={hat} /></div>
-      <button>Salvar ⬇</button>
+      <button type="button" on:click={save}>Salvar ⬇</button>
     </form>
   </main>
 </div>
