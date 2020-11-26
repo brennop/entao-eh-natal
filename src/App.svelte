@@ -1,69 +1,89 @@
 <script>
-  import {onMount} from 'svelte';
-  let count = 0;
+  import { onMount } from "svelte";
+  let canvas;
+  let hat;
+  let image;
+  let x = 0,
+    y = 0;
+  let mouseX = 0,
+    mouseY = 0;
+  let moving = false;
+  let scale = 1;
+
+  const handleUpload = async (event) => {
+    const [file] = event.target.files;
+
+    image = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject();
+      image.src = URL.createObjectURL(file);
+    });
+  };
+
+  function draw() {
+    if (canvas) {
+      const context = canvas.getContext("2d");
+
+      if (image) {
+        context.drawImage(image, 0, 0, 500, 500);
+        context.drawImage(hat, x, y, 200 * scale, 200 * scale);
+      }
+      requestAnimationFrame(draw);
+    }
+  }
+
+  function handleMove(event) {
+    const { clientX, clientY } = event;
+
+    if (moving) {
+      const dx = clientX - mouseX;
+      const dy = clientY - mouseY;
+      x += dx;
+      y += dy;
+      mouseX = clientX;
+      mouseY = clientY;
+      console.log(x, y);
+    }
+  }
+
+  function handleMouseDown(event) {
+    const { clientX, clientY } = event;
+    mouseX = clientX;
+    mouseY = clientY;
+
+    moving = true;
+  }
+
+  function handleMouseUp(event) {
+    moving = false;
+  }
+
   onMount(() => {
-    const interval = setInterval(() => count++, 1000);
-    return () => {
-      clearInterval(interval);
-    };
+    draw();
+    canvas.width = 500;
+    canvas.height = 500;
   });
 </script>
 
 <style>
-  :global(body) {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-  }
-  .App {
-    text-align: center;
-  }
-  .App code {
-    background: #0002;
-    padding: 4px 8px;
-    border-radius: 4px;
-  }
-  .App p {
-    margin: 0.4rem;
+  canvas {
+    margin: auto;
+    width: 500px;
+    height: 500px;
   }
 
-  .App-header {
-    background-color: #f9f6f6;
-    color: #333;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-  }
-  .App-link {
-    color: #ff3e00;
-  }
-  .App-logo {
-    height: 36vmin;
-    pointer-events: none;
-    margin-bottom: 3rem;
-    animation: App-logo-spin infinite 1.6s ease-in-out alternate;
-  }
-  @keyframes App-logo-spin {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.06);
-    }
+  .hats {
+    display: none;
   }
 </style>
 
-<div class="App">
-  <header class="App-header">
-    <img src="/logo.svg" class="App-logo" alt="logo" />
-    <p>Edit <code>src/App.svelte</code> and save to reload.</p>
-    <p>Page has been open for <code>{count}</code> seconds.</p>
-    <p>
-      <a class="App-link" href="https://svelte.dev" target="_blank" rel="noopener noreferrer">
-        Learn Svelte
-      </a>
-    </p>
-  </header>
+<div class="App" on:mouseup={handleMouseUp}>
+  <canvas
+    bind:this={canvas}
+    on:mousedown={handleMouseDown}
+    on:mousemove={handleMove} />
+  <input type="range" bind:value={scale} min="0.1" max="3" step="0.01" />
+  <input type="file" name="file" on:change={handleUpload} />
+  <div class="hats"><img src="assets/gorro_01.png" bind:this={hat} /></div>
 </div>
