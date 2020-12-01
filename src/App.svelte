@@ -13,6 +13,7 @@
   let coords = spring({ x: 310, y: 50 });
   let scale = spring(2);
   let rotation = spring(0);
+  let flip = spring(1);
 
   const handleUpload = async (event) => {
     const [file] = event.target.files;
@@ -50,6 +51,7 @@
   }
 
   $: {
+    console.log($flip);
     if (canvas) {
       const context = canvas.getContext("2d");
 
@@ -58,8 +60,15 @@
       if (image) {
         context.drawImage(image, 0, 0, 500, 500);
 
-        context.setTransform($scale, 0, 0, $scale, $coords.x, $coords.y); // sets scale and origin
-        context.rotate((($rotation + 360) * Math.PI) / 180);
+        context.setTransform(
+          $scale * $flip,
+          0,
+          0,
+          $scale,
+          $coords.x,
+          $coords.y
+        ); // sets scale and origin
+        context.rotate((($rotation * $flip + 360) * Math.PI) / 180);
 
         context.drawImage(hat, -100, -100, 200, 200);
 
@@ -276,6 +285,13 @@ how to remove the virtical space around the range input in IE*/
           max="90"
           step="0.1"
           class="slider" />
+      </label>
+      <label>
+        <p>Flip</p>
+        <input
+          type="checkbox"
+          class="slider"
+          on:change={() => flip.update((f) => f * -1)} />
       </label>
       <input id="upload" type="file" name="file" on:change={handleUpload} />
       <div class="hats"><img src="assets/gorro_01.png" bind:this={hat} /></div>
