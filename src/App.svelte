@@ -296,6 +296,13 @@ how to remove the virtical space around the range input in IE*/
       on:mousedown={handleMouseDown}
       on:mousemove={handleMove} />
     <form>
+      <iframe
+        width="300"
+        height="80"
+        src="https://www.youtube.com/embed/h9d7dikBT0w?autoplay=1"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen />
       <h1>Então é Nataaaal 🎄</h1>
       <label for="upload" class="upload">Escolher imagem</label>
       <label>
