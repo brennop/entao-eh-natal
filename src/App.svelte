@@ -15,9 +15,20 @@
   let rotation = spring(0);
   let flip = spring(1);
 
+  let hovering = false;
+
   const handleUpload = async (event) => {
     const [file] = event.target.files;
+    setImage(file);
+  };
 
+  const handleDrop = (event) => {
+    hovering = false;
+    const [file] = event.dataTransfer.files;
+    setImage(file);
+  };
+
+  const setImage = async (file) => {
     image = await new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => resolve(image);
@@ -25,6 +36,8 @@
       image.src = URL.createObjectURL(file);
     });
   };
+
+  const handleDragOver = () => {};
 
   function handleMove(event) {
     const { clientX, clientY } = event;
@@ -51,7 +64,6 @@
   }
 
   $: {
-    console.log($flip);
     if (canvas) {
       const context = canvas.getContext("2d");
 
@@ -107,7 +119,7 @@
     height: 500px;
   }
 
-  .hats {
+  .hidden {
     display: none;
   }
 
@@ -255,9 +267,29 @@ how to remove the virtical space around the range input in IE*/
 
     font-family: "Lobster", Apple Color Emoji, Segoe UI Emoji, sans-serif;
   }
+
+  .dropper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.2s ease-out;
+    pointer-events: none;
+  }
+
+  .hovering {
+    background: #ddd8;
+  }
 </style>
 
-<div class="background" on:mouseup={handleMouseUp}>
+<div class="dropper" class:hovering />
+<div
+  class="background"
+  on:mouseup={handleMouseUp}
+  on:drop|preventDefault={handleDrop}
+  on:dragover|preventDefault={() => (hovering = true)}
+  on:dragleave|preventDefault={() => (hovering = false)}>
   <main>
     <canvas
       bind:this={canvas}
@@ -293,8 +325,15 @@ how to remove the virtical space around the range input in IE*/
           class="slider"
           on:change={() => flip.update((f) => f * -1)} />
       </label>
-      <input id="upload" type="file" name="file" on:change={handleUpload} />
-      <div class="hats"><img src="assets/gorro_01.png" bind:this={hat} /></div>
+      <input
+        id="upload"
+        type="file"
+        name="file"
+        on:change={handleUpload}
+        accept="image/*" />
+      <div class="hidden">
+        <img src="assets/gorro_01.png" bind:this={hat} />
+      </div>
       <button type="button" on:click={save}>Salvar ⬇</button>
     </form>
   </main>
